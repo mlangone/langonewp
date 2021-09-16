@@ -1,0 +1,169 @@
+/************************************************
+
+Stylesheet: Mixins Stylesheet
+
+*************************************************/
+
+// Burger parts
+//
+// (---) top    -> &::before
+// [---] middle -> &
+// (---) bottom -> &::after
+
+// Vendor prefixes
+$sass-burger-add-vendor-prefixes: true !default;
+
+// Burger
+@mixin burger($width: 30px, $height: 5px, $gutter: 3px, $color: #000, $border-radius: 0, $transition-duration: .3s) {
+  $burger-height: $height !global;
+  $burger-gutter: $gutter !global;
+
+  position: relative;
+  margin-top: $height + $gutter;
+  margin-bottom: $height + $gutter;
+
+  @if $sass-burger-add-vendor-prefixes {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+  }
+  user-select: none;
+
+  // 1. Fixes jagged edges in Firefox, see issue #10.
+  &, &::before, &::after {
+    display: block;
+    width: $width;
+    height: $height;
+    background-color: $color;
+    outline: 1px solid transparent; // 1
+    @if $border-radius != 0 {
+      border-radius: $border-radius;
+    }
+
+    @if $sass-burger-add-vendor-prefixes {
+      -webkit-transition-property: background-color, -webkit-transform;
+      -moz-transition-property: background-color, -moz-transform;
+      -o-transition-property: background-color, -o-transform;
+    }
+    transition-property: background-color, transform;
+
+    @if $sass-burger-add-vendor-prefixes {
+      -webkit-transition-duration: $transition-duration;
+      -moz-transition-duration: $transition-duration;
+      -o-transition-duration: $transition-duration;
+    }
+    transition-duration: $transition-duration;
+  }
+
+  &::before, &::after {
+    position: absolute;
+    content: "";
+  }
+
+  &::before {
+    top: -($height + $gutter);
+  }
+
+  &::after {
+    top: $height + $gutter;
+  }
+}
+
+// Select parts of the burger
+@mixin burger-parts {
+  &, &::before, &::after {
+    @content;
+  }
+}
+
+@mixin burger-top {
+  &::before {
+    @content;
+  }
+}
+
+@mixin burger-middle {
+  & {
+    @content;
+  }
+}
+
+@mixin burger-bottom {
+  &::after {
+    @content;
+  }
+}
+
+// Burger animations
+@mixin burger-to-cross($color: auto) {
+  & {
+    background-color: transparent;
+  }
+  @if ($color != auto) {
+    &::before, &::after {
+      background-color: $color;
+    }
+  }
+  &::before {
+    @if $sass-burger-add-vendor-prefixes {
+      -webkit-transform: translateY($burger-gutter + $burger-height) rotate(45deg);
+      -moz-transform: translateY($burger-gutter + $burger-height) rotate(45deg);
+      -ms-transform: translateY($burger-gutter + $burger-height) rotate(45deg);
+      -o-transform: translateY($burger-gutter + $burger-height) rotate(45deg);
+    }
+    transform: translateY($burger-gutter + $burger-height) rotate(45deg);
+  }
+  &::after {
+    @if $sass-burger-add-vendor-prefixes {
+      -webkit-transform: translateY(-($burger-gutter + $burger-height)) rotate(-45deg);
+      -moz-transform: translateY(-($burger-gutter + $burger-height)) rotate(-45deg);
+      -ms-transform: translateY(-($burger-gutter + $burger-height)) rotate(-45deg);
+      -o-transform: translateY(-($burger-gutter + $burger-height)) rotate(-45deg);
+    }
+    transform: translateY(-($burger-gutter + $burger-height)) rotate(-45deg);
+  }
+}
+
+
+$base-box-shadow: 0 25px 60px 0px rgba(0,0,0,.16) !default;
+$base-border-radius:6px;
+$full-box-shadow: 0 0 40px 0 rgba(0,0,0,.16) !default;
+
+// Box borders
+@mixin boxborder {
+  border-radius: $base-border-radius;
+  box-shadow: $base-box-shadow;
+}
+
+// White box
+@mixin whitebox {
+  border-radius: $base-border-radius;
+  box-shadow: $full-box-shadow;
+  background-color: $white;
+}
+
+
+/****************************
+ HIGH PPI DISPLAY BACKGROUNDS
+*****************************/
+// how to use must have the @include
+// span.button-edit-pencil {
+//  @include background-2x('../images/edit-pencil', 'png', 16px, 16px, left, no-repeat);
+//}
+@mixin background-2x($path, $ext: "png", $w: auto, $h: auto, $pos: left top, $repeat: no-repeat) {
+
+  $at1x_path: "#{$path}.#{$ext}";
+  $at2x_path: "#{$path}@2x.#{$ext}";
+
+  background-image: url("#{$at1x_path}");
+  background-size: $w $h;
+  background-position: $pos;
+  background-repeat: $repeat;
+
+  @media all and (-webkit-min-device-pixel-ratio : 1.5),
+  all and (-o-min-device-pixel-ratio: 3/2),
+  all and (min--moz-device-pixel-ratio: 1.5),
+  all and (min-device-pixel-ratio: 1.5) {
+    background-image: url("#{$at2x_path}");
+  }
+}
